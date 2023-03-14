@@ -18,12 +18,15 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"math"
+	"runtime/debug"
 	"sync"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common/mclock"
 	"github.com/ethereum/go-ethereum/les/utils"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/nodestate"
 )
@@ -207,6 +210,8 @@ func (n *nodeBalance) GetRawBalance() (utils.ExpiredValue, utils.ExpiredValue) {
 // zero balance.
 // Note: this function should run inside a NodeStateMachine operation
 func (n *nodeBalance) AddBalance(amount int64) (uint64, uint64, error) {
+	log.Info(fmt.Sprintf("add balance: %d, %s", amount, debug.Stack()))
+
 	var (
 		err         error
 		old, new    uint64

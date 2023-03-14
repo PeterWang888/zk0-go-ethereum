@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"runtime/debug"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -253,14 +254,17 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 			reward.Mul(reward, blockReward)
 			reward.Div(reward, big.NewInt(8))
 			statedb.AddBalance(ommer.Address, reward)
+			log.Info(fmt.Sprintf("add balance: %s, %s, %s", ommer.Address.Hex(), reward.String(), debug.Stack()))
 		}
 		statedb.AddBalance(pre.Env.Coinbase, minerReward)
+		log.Info(fmt.Sprintf("add balance: %s, %s, %s", pre.Env.Coinbase.Hex(), minerReward.String(), debug.Stack()))
 	}
 	// Apply withdrawals
 	for _, w := range pre.Env.Withdrawals {
 		// Amount is in gwei, turn into wei
 		amount := new(big.Int).Mul(new(big.Int).SetUint64(w.Amount), big.NewInt(params.GWei))
 		statedb.AddBalance(w.Address, amount)
+		log.Info(fmt.Sprintf("add balance: %s, %s, %s", w.Address.Hex(), amount.String(), debug.Stack()))
 	}
 	// Commit block
 	root, err := statedb.Commit(chainConfig.IsEIP158(vmContext.BlockNumber))

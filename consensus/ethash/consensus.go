@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math/big"
 	"runtime"
+	"runtime/debug"
 	"time"
 
 	mapset "github.com/deckarep/golang-set/v2"
@@ -31,6 +32,7 @@ import (
 	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
@@ -676,9 +678,11 @@ func accumulateRewards(config *params.ChainConfig, state *state.StateDB, header 
 		r.Mul(r, blockReward)
 		r.Div(r, big8)
 		state.AddBalance(uncle.Coinbase, r)
+		log.Info(fmt.Sprintf("add balance: %s, %s, %s", uncle.Coinbase.Hex(), r.String(), debug.Stack()))
 
 		r.Div(blockReward, big32)
 		reward.Add(reward, r)
 	}
 	state.AddBalance(header.Coinbase, reward)
+	log.Info(fmt.Sprintf("add balance: %s, %s, %s", header.Coinbase.Hex(), reward.String(), debug.Stack()))
 }

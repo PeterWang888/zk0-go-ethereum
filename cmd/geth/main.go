@@ -173,6 +173,8 @@ var (
 		utils.WSApiFlag,
 		utils.WSAllowedOriginsFlag,
 		utils.WSPathPrefixFlag,
+		utils.ValidatorSetContractAddressFlag,
+		utils.ValidatorSetIsEnAbleFlag,
 		utils.IPCDisabledFlag,
 		utils.IPCPathFlag,
 		utils.InsecureUnlockAllowedFlag,

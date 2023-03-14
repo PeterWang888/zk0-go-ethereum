@@ -107,6 +107,8 @@ func newNode(typ nodetype, genesis *core.Genesis, enodes []*enode.Node) *ethNode
 		ethBackend *eth.Ethereum
 		lesBackend *les.LightEthereum
 	)
+
+	log.Info("----------------------Node Type--------------------")
 	// Start the node and wait until it's up
 	if typ == eth2LightClient {
 		stack, lesBackend, lapi, err = makeLightNode(genesis)

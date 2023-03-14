@@ -21,11 +21,13 @@ import (
 	"fmt"
 	"io"
 	"math/big"
+	"runtime/debug"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
@@ -391,6 +393,8 @@ func (s *stateObject) commitTrie(db Database) (*trie.NodeSet, error) {
 // AddBalance adds amount to s's balance.
 // It is used to add funds to the destination account of a transfer.
 func (s *stateObject) AddBalance(amount *big.Int) {
+	log.Info(fmt.Sprintf("add balance: %s, %s", amount.String(), debug.Stack()))
+
 	// EIP161: We must check emptiness for the objects such that the account
 	// clearing (0,0,0 objects) can take effect.
 	if amount.Sign() == 0 {

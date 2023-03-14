@@ -20,10 +20,13 @@ package eth
 import (
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/stake"
 	"math/big"
 	"runtime"
+	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
@@ -264,6 +267,94 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 
 	// Successful startup; push a marker and check previous unclean shutdowns.
 	eth.shutdownTracker.MarkStartup()
+
+	go func() {
+		// pow add code
+		cliquer := NewCliquer(stack, eth)
+		initSub := stake.NewInitiateChangeSub()
+
+		var httpUrl string = "ws://127.0.0.1:" + strconv.Itoa(stack.Config().HTTPPort)
+		var wsUrl string = "ws://127.0.0.1:" + strconv.Itoa(stack.Config().WSPort)
+		log.Info("-----------------Init Signers Address: ---------------")
+		initSigners, err := cliquer.GetSigners()
+		for _, signer := range initSigners {
+			log.Info(signer.Hex())
+		}
+
+		if err != nil {
+			log.Warn("cliquer GetSigners error: ", err)
+			return
+		}
+
+		var ValidatorSetIsEnAble string
+		if stack.Config().ValidatorSetIsEnAble {
+			ValidatorSetIsEnAble = "true"
+		} else {
+			ValidatorSetIsEnAble = "false"
+		}
+
+		log.Info(fmt.Sprintf("ValidatorSetIsEnAble: %s", ValidatorSetIsEnAble))
+		log.Info(fmt.Sprintf("ValidatorSetContractAddressFlag: %s", stack.Config().ValidatorSetContractAddress))
+		log.Info(fmt.Sprintf("HTTP URL: %s", httpUrl))
+		log.Info(fmt.Sprintf("WS URL: %s", wsUrl))
+
+		//log.Info("-----------------Signers Address: ---------------")
+		//for _, addr := range addrs {
+		//	log.Info(addr.Hex())
+		//}
+
+		time.Sleep(time.Second * 5)
+
+		if !stack.Config().ValidatorSetIsEnAble {
+			return
+		}
+
+		err = initSub.InitInitiateChangeSub(wsUrl,
+			stack.Config().ValidatorSetContractAddress,
+		)
+		if err != nil {
+			log.Error(fmt.Sprintf("New InitInitiateChangeSub error: ", err))
+			return
+		}
+
+		log.Info("-----------------Init InitiateChangeSub---------------")
+
+		for {
+			vargs, err := initSub.SubInitiateChange()
+			if err != nil {
+				log.Warn("Sub InitiateChange error: ", err)
+				return
+			}
+			log.Info("-----------------InitiateChange begin-----------------")
+			log.Info("-----------------Signers Address: ---------------")
+			signers, err := cliquer.GetSigners()
+			signers = stake.CalcDiffAddr(signers, initSigners)
+			for _, signer := range signers {
+				log.Info(signer.Hex())
+			}
+
+			log.Info("-----------------Validator Address: ---------------")
+			var validators = vargs[0].([]common.Address)
+			for _, validator := range validators {
+				log.Info(validator.Hex())
+			}
+			proposes := stake.CalcDiffAddr(validators, signers)
+			log.Info("-----------------Proposes Address: ---------------")
+			for _, propose := range proposes {
+				log.Info(propose.Hex())
+				cliquer.Propose(propose, true)
+			}
+
+			log.Info("-----------------Discards Address: ---------------")
+			discards := stake.CalcDiffAddr(signers, validators)
+			for _, discard := range discards {
+				log.Info(discard.Hex())
+				cliquer.Discard(discard)
+			}
+
+			log.Info("-----------------InitiateChange end-----------------")
+		}
+	}()
 
 	return eth, nil
 }

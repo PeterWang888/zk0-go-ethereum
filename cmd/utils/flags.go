@@ -771,6 +771,17 @@ var (
 		Value:    "",
 		Category: flags.APICategory,
 	}
+	ValidatorSetContractAddressFlag = &cli.StringFlag{
+		Name:     "vscontr",
+		Usage:    "Validator SetContract Address Flag",
+		Category: flags.NetworkingCategory,
+	}
+	ValidatorSetIsEnAbleFlag = &cli.BoolFlag{
+		Name:     "isvs",
+		Usage:    "Validator Set Is EnAble",
+		Value:    false,
+		Category: flags.NetworkingCategory,
+	}
 	ExecFlag = &cli.StringFlag{
 		Name:     "exec",
 		Usage:    "Execute JavaScript statement",
@@ -1248,6 +1259,16 @@ func setWS(ctx *cli.Context, cfg *node.Config) {
 	}
 }
 
+func setValidatorSet(ctx *cli.Context, cfg *node.Config) {
+	if ctx.IsSet(ValidatorSetIsEnAbleFlag.Name) {
+		cfg.ValidatorSetIsEnAble = ctx.Bool(ValidatorSetIsEnAbleFlag.Name)
+	}
+
+	if ctx.IsSet(ValidatorSetContractAddressFlag.Name) {
+		cfg.ValidatorSetContractAddress = ctx.String(ValidatorSetContractAddressFlag.Name)
+	}
+}
+
 // setIPC creates an IPC path configuration from the set command line flags,
 // returning an empty string if IPC was explicitly disabled, or the set path.
 func setIPC(ctx *cli.Context, cfg *node.Config) {
@@ -1462,6 +1483,7 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	setHTTP(ctx, cfg)
 	setGraphQL(ctx, cfg)
 	setWS(ctx, cfg)
+	setValidatorSet(ctx, cfg)
 	setNodeUserIdent(ctx, cfg)
 	SetDataDir(ctx, cfg)
 	setSmartCard(ctx, cfg)

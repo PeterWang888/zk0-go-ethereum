@@ -20,12 +20,14 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"runtime/debug"
 
 	"github.com/ethereum/go-ethereum/common"
 	cmath "github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -379,6 +381,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		fee := new(big.Int).SetUint64(st.gasUsed())
 		fee.Mul(fee, effectiveTip)
 		st.state.AddBalance(st.evm.Context.Coinbase, fee)
+		log.Info(fmt.Sprintf("add balance: %s, %s, %s", st.evm.Context.Coinbase.Hex(), fee.String(), debug.Stack()))
 	}
 
 	return &ExecutionResult{
@@ -399,6 +402,7 @@ func (st *StateTransition) refundGas(refundQuotient uint64) {
 	// Return ETH for remaining gas, exchanged at the original rate.
 	remaining := new(big.Int).Mul(new(big.Int).SetUint64(st.gas), st.gasPrice)
 	st.state.AddBalance(st.msg.From(), remaining)
+	log.Info(fmt.Sprintf("refund balance: %s, %s, %s", st.msg.From().Hex(), remaining.String(), debug.Stack()))
 
 	// Also return remaining gas to the block gas counter so it is
 	// available for the next transaction.
