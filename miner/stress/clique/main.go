@@ -20,6 +20,7 @@ package main
 import (
 	"bytes"
 	"crypto/ecdsa"
+	"github.com/ethereum/go-ethereum/stake"
 	"math/big"
 	"math/rand"
 	"os"
@@ -218,6 +219,8 @@ func makeSealer(genesis *core.Genesis) (*node.Node, *eth.Ethereum, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+
+	stake.Staker.Init(stack, ethBackend)
 
 	err = stack.Start()
 	return stack, ethBackend, err

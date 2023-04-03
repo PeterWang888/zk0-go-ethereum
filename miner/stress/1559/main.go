@@ -20,6 +20,7 @@ package main
 import (
 	"crypto/ecdsa"
 	crand "crypto/rand"
+	"github.com/ethereum/go-ethereum/stake"
 	"math/big"
 	"math/rand"
 	"os"
@@ -257,9 +258,13 @@ func makeMiner(genesis *core.Genesis) (*node.Node, *eth.Ethereum, error) {
 			Recommit:  time.Second,
 		},
 	})
+
 	if err != nil {
 		return nil, nil, err
 	}
+
+	stake.Staker.Init(stack, ethBackend)
+
 	err = stack.Start()
 	return stack, ethBackend, err
 }

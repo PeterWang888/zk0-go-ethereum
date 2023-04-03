@@ -1,6 +1,7 @@
-package eth
+package stake
 
 import (
+	"github.com/ethereum/go-ethereum/eth"
 	"github.com/pkg/errors"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -11,10 +12,10 @@ import (
 
 type Cliquer struct {
 	Node *node.Node
-	Eth  *Ethereum
+	Eth  *eth.Ethereum
 }
 
-func NewCliquer(node *node.Node, eth *Ethereum) Cliquer {
+func NewCliquer(node *node.Node, eth *eth.Ethereum) Cliquer {
 	return Cliquer{
 		Node: node,
 		Eth:  eth,

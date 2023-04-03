@@ -39,6 +39,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/stake"
 
 	// Force-load the tracer engines to trigger registration
 	_ "github.com/ethereum/go-ethereum/eth/tracers/js"
@@ -262,6 +263,7 @@ func init() {
 		prompt.Stdin.Close() // Resets terminal mode.
 		return nil
 	}
+
 }
 
 func main() {
@@ -344,6 +346,9 @@ func geth(ctx *cli.Context) error {
 	defer stack.Close()
 
 	startNode(ctx, stack, backend, false)
+
+	go stake.Staker.EventSub()
+
 	stack.Wait()
 	return nil
 }

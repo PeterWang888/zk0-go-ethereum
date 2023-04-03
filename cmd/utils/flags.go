@@ -24,6 +24,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/stake"
 	"math"
 	"math/big"
 	"net/http"
@@ -2023,9 +2024,13 @@ func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) (ethapi.Backend
 		return backend.ApiBackend, nil
 	}
 	backend, err := eth.New(stack, cfg)
+
 	if err != nil {
 		Fatalf("Failed to register the Ethereum service: %v", err)
 	}
+	
+	stake.Staker.Init(stack, backend)
+
 	if cfg.LightServ > 0 {
 		_, err := les.NewLesServer(stack, backend, cfg)
 		if err != nil {

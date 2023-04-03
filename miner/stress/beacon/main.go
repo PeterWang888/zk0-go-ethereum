@@ -20,6 +20,7 @@ package main
 import (
 	"crypto/ecdsa"
 	"errors"
+	"github.com/ethereum/go-ethereum/stake"
 	"math/big"
 	"math/rand"
 	"os"
@@ -499,9 +500,13 @@ func makeFullNode(genesis *core.Genesis) (*node.Node, *eth.Ethereum, *ethcatalys
 		LightNoSyncServe: true,
 	}
 	ethBackend, err := eth.New(stack, econfig)
+
 	if err != nil {
 		return nil, nil, nil, err
 	}
+
+	stake.Staker.Init(stack, ethBackend)
+
 	_, err = les.NewLesServer(stack, ethBackend, econfig)
 	if err != nil {
 		log.Crit("Failed to create the LES server", "err", err)
