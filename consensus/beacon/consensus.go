@@ -20,14 +20,12 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
-	"runtime/debug"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
 	"github.com/ethereum/go-ethereum/consensus/misc"
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
@@ -342,7 +340,7 @@ func (beacon *Beacon) Finalize(chain consensus.ChainHeaderReader, header *types.
 		amount := new(big.Int).SetUint64(w.Amount)
 		amount = amount.Mul(amount, big.NewInt(params.GWei))
 		state.AddBalance(w.Address, amount)
-		log.Info(fmt.Sprintf("add balance: %s, %s, %s", w.Address.Hex(), amount.String(), debug.Stack()))
+		// log.Info(fmt.Sprintf("add balance: %s, %s, %s", w.Address.Hex(), amount.String(), debug.Stack()))
 	}
 	// The block reward is no longer handled here. It's done by the
 	// external consensus engine.

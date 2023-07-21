@@ -19,13 +19,11 @@ package les
 import (
 	"errors"
 	"fmt"
-	"runtime/debug"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/mclock"
 	vfs "github.com/ethereum/go-ethereum/les/vflux/server"
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 )
 
@@ -240,7 +238,7 @@ func (api *LightServerAPI) SetConnectedBias(bias time.Duration) error {
 // AddBalance adds the given amount to the balance of a client if possible and returns
 // the balance before and after the operation
 func (api *LightServerAPI) AddBalance(node string, amount int64) (balance [2]uint64, err error) {
-	log.Info(fmt.Sprintf("add balance: %s, %d, %s", node, amount, debug.Stack()))
+	// log.Info(fmt.Sprintf("add balance: %s, %d, %s", node, amount, debug.Stack()))
 
 	var id enode.ID
 	if id, err = parseNode(node); err != nil {

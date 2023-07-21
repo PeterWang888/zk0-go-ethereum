@@ -381,7 +381,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		fee := new(big.Int).SetUint64(st.gasUsed())
 		fee.Mul(fee, effectiveTip)
 		st.state.AddBalance(st.evm.Context.Coinbase, fee)
-		log.Info(fmt.Sprintf("add balance: %s, %s, %s", st.evm.Context.Coinbase.Hex(), fee.String(), debug.Stack()))
+		// log.Info(fmt.Sprintf("add balance: %s, %s, %s", st.evm.Context.Coinbase.Hex(), fee.String(), debug.Stack()))
 	}
 
 	return &ExecutionResult{

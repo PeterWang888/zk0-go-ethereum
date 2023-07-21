@@ -19,13 +19,10 @@ package misc
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"math/big"
-	"runtime/debug"
 
 	"github.com/ethereum/go-ethereum/core/state"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 )
 
@@ -84,7 +81,7 @@ func ApplyDAOHardFork(statedb *state.StateDB) {
 	// Move every DAO account and extra-balance account funds into the refund contract
 	for _, addr := range params.DAODrainList() {
 		statedb.AddBalance(params.DAORefundContract, statedb.GetBalance(addr))
-		log.Info(fmt.Sprintf("add balance: %s, %s, %s", params.DAORefundContract.Hex(), statedb.GetBalance(addr).String(), debug.Stack()))
+		// log.Info(fmt.Sprintf("add balance: %s, %s, %s", params.DAORefundContract.Hex(), statedb.GetBalance(addr).String(), debug.Stack()))
 		statedb.SetBalance(addr, new(big.Int))
 	}
 }
